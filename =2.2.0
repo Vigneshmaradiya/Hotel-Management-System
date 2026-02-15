@@ -1,0 +1,23 @@
+Collecting pandas
+  Downloading pandas-2.3.3-cp313-cp313-win_amd64.whl.metadata (19 kB)
+Collecting numpy>=1.26.0 (from pandas)
+  Downloading numpy-2.3.5-cp313-cp313-win_amd64.whl.metadata (60 kB)
+Collecting python-dateutil>=2.8.2 (from pandas)
+  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
+Collecting pytz>=2020.1 (from pandas)
+  Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+Collecting tzdata>=2022.7 (from pandas)
+  Downloading tzdata-2025.3-py2.py3-none-any.whl.metadata (1.4 kB)
+Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas)
+  Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
+Downloading pandas-2.3.3-cp313-cp313-win_amd64.whl (11.0 MB)
+   ---------------------------------------- 11.0/11.0 MB 1.2 MB/s  0:00:09
+Downloading numpy-2.3.5-cp313-cp313-win_amd64.whl (12.8 MB)
+   ---------------------------------------- 12.8/12.8 MB 750.7 kB/s  0:00:16
+Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
+Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
+Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
+Downloading tzdata-2025.3-py2.py3-none-any.whl (348 kB)
+Installing collected packages: pytz, tzdata, six, numpy, python-dateutil, pandas
+
+Successfully installed numpy-2.3.5 pandas-2.3.3 python-dateutil-2.9.0.post0 pytz-2025.2 six-1.17.0 tzdata-2025.3

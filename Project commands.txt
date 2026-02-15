@@ -1,0 +1,26 @@
+Project commands
+
+Python commands:
+
+- python --version
+
+- python -m venv .venv 		 (To create a virtual environment of name .venv)
+- .\.venv\Scripts\Activate.ps1     (To activate the virtual environment)   (use .ps1 only in powershell not in CMD)
+- Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned (optional)  (On + CategoryInfo : SecurityError: (:) [], PSSecurityException)
+
+- pip install -r .\requirements.txt (For installing all the libraries in requirements.txt file)
+
+
+
+
+
+
+MySQL commands:
+
+- CREATE USER 'hms_user'@'localhost' IDENTIFIED BY 'hms_user';    (To create MySQL user named hms_user with password hms_user)
+- MySQL Login : ( mysql -u hms_user -p 'hms_user' )   (MySQL , -u : user , hms_user: username, -p : password)
+
+If username and password is not hms_user : Edit .env file (username, password)
+
+In backend run : python main.py
+In frontend run : streamlit run app.py
