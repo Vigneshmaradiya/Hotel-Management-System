@@ -193,6 +193,7 @@ def get_guest(guest_id: int):
 @app.post("/guests", response_model=GuestResponse)
 def create_guest(guest: Guest):
     """Create a new guest"""
+    print(f"Received guest data: {guest}")  # Debug logging
     connection = get_db_connection()
     if not connection:
         raise HTTPException(status_code=500, detail="Database connection failed")
@@ -210,7 +211,15 @@ def create_guest(guest: Guest):
         return new_guest
     except Exception as e:
         connection.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+        error_msg = str(e)
+        print(f"Error creating guest: {type(e).__name__}: {error_msg}")  # Better error logging
+        
+        # Handle unique constraint violation for email
+        if "unique constraint" in error_msg.lower() or "duplicate key" in error_msg.lower():
+            if "email" in error_msg.lower():
+                raise HTTPException(status_code=400, detail=f"Email '{guest.email}' is already registered")
+        
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {error_msg}")
     finally:
         cursor.close()
         close_db_connection(connection)

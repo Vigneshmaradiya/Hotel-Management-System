@@ -65,6 +65,14 @@ def post_data(endpoint, data):
         response = requests.post(f"{API_BASE_URL}{endpoint}", json=data)
         response.raise_for_status()
         return response.json()
+    except requests.exceptions.HTTPError as e:
+        # Try to extract error message from response
+        try:
+            error_detail = e.response.json().get('detail', str(e))
+            st.error(f"Error: {error_detail}")
+        except:
+            st.error(f"Error posting data: {e}")
+        return None
     except requests.exceptions.RequestException as e:
         st.error(f"Error posting data: {e}")
         return None
