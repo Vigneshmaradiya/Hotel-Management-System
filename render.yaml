@@ -1,0 +1,14 @@
+# Render.com configuration
+# Learn more: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: hms-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        sync: false # Set manually in Render dashboard for security

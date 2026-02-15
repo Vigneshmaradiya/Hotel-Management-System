@@ -1,6 +1,6 @@
 # 🏨 Hotel Management System
 
-A comprehensive Hotel Management System built with **Streamlit** (Frontend), **FastAPI** (Backend REST API), and **MySQL** (Database).
+A comprehensive Hotel Management System built with **Streamlit** (Frontend), **FastAPI** (Backend REST API), and **PostgreSQL** (Database).
 
 ## 📋 Features
 
@@ -10,14 +10,15 @@ A comprehensive Hotel Management System built with **Streamlit** (Frontend), **F
 - **Dashboard**: Overview of hotel operations with metrics and statistics
 - **Real-time Updates**: Dynamic status updates for rooms and bookings
 - **RESTful API**: Well-structured backend API for all operations
+- **Cloud-Ready**: Dockerized backend ready for deployment
 
 ## 🛠️ Technology Stack
 
 - **Frontend**: Streamlit
-- **Backend**: FastAPI
-- **Database**: MySQL
+- **Backend**: FastAPI (Dockerized)
+- **Database**: PostgreSQL (Supabase)
 - **API Communication**: REST API
-- **Python Version**: 3.8+
+- **Python Version**: 3.11+
 
 ## 📁 Project Structure
 
@@ -151,6 +152,40 @@ The frontend will open automatically in your browser at: `http://localhost:8501`
 1. **View Bookings**: See all bookings with complete details
 2. **Create Booking**: Make new reservations by selecting guest, room, and dates
 3. **Manage Booking**: View booking details and cancel if needed
+
+## ☁️ Cloud Deployment
+
+### Deploy to Production
+
+This application is production-ready with Docker support. Deploy your backend to a cloud service for global access:
+
+#### Quick Deploy Options:
+
+1. **Railway** (Recommended - Easiest)
+   - Free tier: 500 hours/month
+   - Auto-deploys from GitHub
+   - See [BACKEND_DEPLOYMENT.md](BACKEND_DEPLOYMENT.md) for detailed instructions
+
+2. **Render** 
+   - Free tier with auto-sleep
+   - Blueprint included ([render.yaml](render.yaml))
+
+3. **Fly.io**
+   - Free tier with 3 VMs
+   - Configuration ready ([fly.toml](fly.toml))
+
+#### Deploy Frontend (Streamlit Cloud):
+
+1. Go to [share.streamlit.io](https://share.streamlit.io)
+2. Sign in with GitHub
+3. Deploy this repository
+4. Set main file: `frontend/app.py`
+5. Add secret in settings:
+   ```toml
+   API_BASE_URL = "https://your-backend-url.com"
+   ```
+
+**📖 Full deployment guide**: See [BACKEND_DEPLOYMENT.md](BACKEND_DEPLOYMENT.md)
 
 ## 🔧 Troubleshooting
 

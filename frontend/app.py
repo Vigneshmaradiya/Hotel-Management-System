@@ -2,9 +2,10 @@ import streamlit as st
 import requests
 import pandas as pd
 from datetime import date, timedelta
+import os
 
-# API base URL
-API_BASE_URL = "http://localhost:8000"
+# API base URL - Use environment variable or Streamlit secrets, fallback to localhost
+API_BASE_URL = os.getenv("API_BASE_URL", st.secrets.get("API_BASE_URL", "http://localhost:8000"))
 
 # Page configuration
 st.set_page_config(
