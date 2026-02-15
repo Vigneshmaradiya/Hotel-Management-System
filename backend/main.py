@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 import uvicorn
+from psycopg2.extras import RealDictCursor
 from database import get_db_connection, close_db_connection
 from models import (
     Room, RoomResponse, Guest, GuestResponse, 
@@ -33,7 +34,7 @@ def get_rooms():
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("SELECT * FROM rooms")
         rooms = cursor.fetchall()
         return rooms
@@ -51,7 +52,7 @@ def get_room(room_id: int):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("SELECT * FROM rooms WHERE id = %s", (room_id,))
         room = cursor.fetchone()
         if not room:
@@ -73,16 +74,15 @@ def create_room(room: Room):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             INSERT INTO rooms (room_number, room_type, price, status)
             VALUES (%s, %s, %s, %s)
+            RETURNING *
         """
         cursor.execute(query, (room.room_number, room.room_type, room.price, room.status))
-        connection.commit()
-        
-        cursor.execute("SELECT * FROM rooms WHERE id = %s", (cursor.lastrowid,))
         new_room = cursor.fetchone()
+        connection.commit()
         return new_room
     except Exception as e:
         connection.rollback()
@@ -99,7 +99,7 @@ def update_room(room_id: int, room: Room):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             UPDATE rooms 
             SET room_number = %s, room_type = %s, price = %s, status = %s
@@ -158,7 +158,7 @@ def get_guests():
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("SELECT * FROM guests ORDER BY created_at DESC")
         guests = cursor.fetchall()
         return guests
@@ -176,7 +176,7 @@ def get_guest(guest_id: int):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         cursor.execute("SELECT * FROM guests WHERE id = %s", (guest_id,))
         guest = cursor.fetchone()
         if not guest:
@@ -198,16 +198,15 @@ def create_guest(guest: Guest):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             INSERT INTO guests (first_name, last_name, email, phone, address)
             VALUES (%s, %s, %s, %s, %s)
+            RETURNING *
         """
         cursor.execute(query, (guest.first_name, guest.last_name, guest.email, guest.phone, guest.address))
-        connection.commit()
-        
-        cursor.execute("SELECT * FROM guests WHERE id = %s", (cursor.lastrowid,))
         new_guest = cursor.fetchone()
+        connection.commit()
         return new_guest
     except Exception as e:
         connection.rollback()
@@ -224,7 +223,7 @@ def update_guest(guest_id: int, guest: Guest):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             UPDATE guests 
             SET first_name = %s, last_name = %s, email = %s, phone = %s, address = %s
@@ -283,11 +282,11 @@ def get_bookings():
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             SELECT 
                 b.id as booking_id,
-                CONCAT(g.first_name, ' ', g.last_name) as guest_name,
+                g.first_name || ' ' || g.last_name as guest_name,
                 r.room_number,
                 r.room_type,
                 b.check_in_date,
@@ -317,11 +316,11 @@ def get_booking(booking_id: int):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         query = """
             SELECT 
                 b.id as booking_id,
-                CONCAT(g.first_name, ' ', g.last_name) as guest_name,
+                g.first_name || ' ' || g.last_name as guest_name,
                 r.room_number,
                 r.room_type,
                 b.check_in_date,
@@ -355,7 +354,7 @@ def create_booking(booking: Booking):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         
         # Check if room is available
         cursor.execute("SELECT status FROM rooms WHERE id = %s", (booking.room_id,))
@@ -381,11 +380,12 @@ def create_booking(booking: Booking):
         query = """
             INSERT INTO bookings (guest_id, room_id, check_in_date, check_out_date, total_amount, status)
             VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id
         """
         cursor.execute(query, (booking.guest_id, booking.room_id, booking.check_in_date, 
                               booking.check_out_date, booking.total_amount, booking.status))
         
-        booking_id = cursor.lastrowid
+        booking_id = cursor.fetchone()["id"]
         
         # Update room status based on booking status and dates
         from datetime import date as date_type
@@ -421,7 +421,7 @@ def update_booking(booking_id: int, booking: Booking):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         
         # Get old booking details
         cursor.execute("SELECT * FROM bookings WHERE id = %s", (booking_id,))
@@ -499,7 +499,7 @@ def cancel_booking(booking_id: int):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         
         # Get booking details
         cursor.execute("SELECT room_id FROM bookings WHERE id = %s", (booking_id,))
@@ -532,7 +532,7 @@ def get_available_rooms(check_in: str = None, check_out: str = None):
         raise HTTPException(status_code=500, detail="Database connection failed")
     
     try:
-        cursor = connection.cursor(dictionary=True)
+        cursor = connection.cursor(cursor_factory=RealDictCursor)
         
         if check_in and check_out:
             # Get rooms that are either available or don't have conflicting bookings
